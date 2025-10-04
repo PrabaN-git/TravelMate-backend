@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const Booking = require("../models/Booking");
-const User = require("../models/User");
 const Place = require("../models/Place");
 
 // Create a new booking
@@ -37,7 +36,7 @@ router.post("/", async (req, res) => {
       specialRequests: req.body.specialRequests,
       couponCode: req.body.couponCode,
       termsAccepted: req.body.termsAccepted,
-      place: req.body.placeId // optional: include the place id
+      place: req.body.placeId || null // optional reference to Place
     });
 
     await booking.save();
@@ -48,17 +47,13 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET all bookings for admin with populated user & place info
+// Get all bookings (for admin dashboard)
 router.get("/", async (req, res) => {
   try {
-    const bookings = await Booking.find()
-      .sort({ createdAt: -1 })
-      .populate("userId", "username email") // populate user info
-      .populate("place", "name");          // populate place info
-
+    const bookings = await Booking.find().sort({ createdAt: -1 });
     res.status(200).json(bookings);
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching bookings:", err);
     res.status(500).json({ message: "Error fetching bookings", error: err.message });
   }
 });
