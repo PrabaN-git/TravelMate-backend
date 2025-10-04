@@ -1,46 +1,57 @@
 const express = require("express");
 const router = express.Router();
 const Booking = require("../models/Booking");
-const Place = require("../models/Place"); // if you want place name
+const Place = require("../models/Place"); // optional if you want to validate place
 
-// Get all bookings (for admin)
+// Create a new booking
+router.post("/", async (req, res) => {
+  try {
+    const booking = new Booking({
+      userId: req.body.userId,
+      fullName: req.body.fullName,
+      email: req.body.email,
+      phone: req.body.phone,
+      gender: req.body.gender,
+      age: req.body.age,
+      departureLocation: req.body.departureLocation,
+      destination: req.body.destination,
+      departureDate: req.body.departureDate,
+      returnDate: req.body.returnDate,
+      tripType: req.body.tripType,
+      travelers: req.body.travelers,
+      travelMode: req.body.travelMode,
+      preferredTime: req.body.preferredTime,
+      seatClass: req.body.seatClass,
+      hotelBooking: req.body.hotelBooking,
+      checkInDate: req.body.checkInDate,
+      checkOutDate: req.body.checkOutDate,
+      roomType: req.body.roomType,
+      numRooms: req.body.numRooms,
+      paymentMethod: req.body.paymentMethod,
+      cardNumber: req.body.cardNumber,
+      expiryDate: req.body.expiryDate,
+      cvv: req.body.cvv,
+      billingAddress: req.body.billingAddress,
+      travelInsurance: req.body.travelInsurance,
+      specialRequests: req.body.specialRequests,
+      couponCode: req.body.couponCode,
+      termsAccepted: req.body.termsAccepted
+    });
+
+    await booking.save();
+    res.status(201).json({ message: "Booking created successfully", booking });
+  } catch (err) {
+    console.error("Error creating booking:", err);
+    res.status(500).json({ message: "Failed to create booking", error: err.message });
+  }
+});
+
+// Existing GET route for admin
 router.get("/", async (req, res) => {
   try {
-    // Fetch bookings
     const bookings = await Booking.find().sort({ createdAt: -1 });
-
-    // Map place ObjectId to place name
-    const bookingsWithPlaceName = await Promise.all(
-      bookings.map(async (b) => {
-        let placeName = "N/A";
-        if (b.place) {
-          const place = await Place.findById(b.place);
-          if (place) placeName = place.name;
-        }
-        return {
-          _id: b._id,
-          fullName: b.fullName,
-          email: b.email,
-          phone: b.phone,
-          gender: b.gender,
-          age: b.age,
-          departureLocation: b.departureLocation,
-          destination: b.destination,
-          departureDate: b.departureDate,
-          returnDate: b.returnDate,
-          travelers: b.travelers,
-          travelMode: b.travelMode,
-          seatClass: b.seatClass,
-          hotelBooking: b.hotelBooking,
-          status: b.status || "Completed",
-          placeName
-        };
-      })
-    );
-
-    res.status(200).json(bookingsWithPlaceName);
+    res.status(200).json(bookings);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Error fetching bookings", error: err.message });
   }
 });

@@ -1,6 +1,7 @@
 // seed.js
+require("dotenv").config();
 const mongoose = require("mongoose");
-const Place = require("../models/Place");
+const Place = require("../models/Place"); // <-- fixed path
 
 const places = [
   { 
@@ -41,12 +42,15 @@ const places = [
   }
 ];
 
-mongoose.connect("mongodb://localhost:27017/travelmate", {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(async () => {
+  console.log("Connected to MongoDB, seeding data...");
   await Place.deleteMany({});
   await Place.insertMany(places);
-  console.log("Places seeded successfully");
+  console.log("✅ Places seeded successfully");
   mongoose.connection.close();
+}).catch(err => {
+  console.error("❌ Error connecting to MongoDB:", err);
 });
