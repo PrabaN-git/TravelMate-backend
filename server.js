@@ -25,5 +25,11 @@ app.use("/api/places", placesRoute);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+const PORT = process.env.PORT;  // don’t fallback to 5000 on Render
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+// Health check endpoint for Render
+app.get("/healthz", (req, res) => {
+  res.status(200).send("OK");
+});
