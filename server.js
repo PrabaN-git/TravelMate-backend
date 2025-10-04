@@ -25,7 +25,7 @@ app.use("/api/places", placesRoute);
 app.use("/api/bookings", bookingRoutes);
 
 // Start server
-const PORT = process.env.PORT;  // don’t fallback to 5000 on Render
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
